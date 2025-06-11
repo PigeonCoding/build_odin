@@ -1,1 +1,2 @@
-out
+example/out/*
+!example/out/main.odin

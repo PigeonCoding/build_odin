@@ -1,4 +1,4 @@
-// v0.1
+// v0.2
 package build_odin
 
 import "core:fmt"
@@ -367,7 +367,7 @@ odin_cmd_builder :: struct {
   directory: string,
 }
 
-build_cmd :: proc(b: ^odin_cmd_builder) -> []string {
+build_cmd :: proc(b: ^odin_cmd_builder) -> [dynamic]string {
   res: [dynamic]string
 
 
@@ -974,6 +974,6 @@ build_cmd :: proc(b: ^odin_cmd_builder) -> []string {
     append(&res, strings.concatenate({"-pdb-name:", b.flags.pdb_name}))
   }
 
-  return res[:]
+  return res
 }
 
