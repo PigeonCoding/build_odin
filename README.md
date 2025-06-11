@@ -2,7 +2,6 @@
 ## example
 run 
 ```
-$ mkdir out
 $ odin run ./example/out
 ```
 
