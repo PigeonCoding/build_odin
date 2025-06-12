@@ -1,4 +1,6 @@
-// v0.2
+// v0.3
+// changelog:
+//  0.3: rewrote exec_and_run_sync to use exec_and_run_async instead of copying the code
 package build_odin
 
 import "core:fmt"
@@ -8,19 +10,10 @@ import "core:strings"
 
 
 exec_and_run_sync :: proc(cmd: []string) -> Maybe(os2.Error) {
-  procc: os2.Process_Desc
-  procc.stderr = os2.stderr
-  procc.stdout = os2.stdout
-  procc.env = nil
-  procc.working_dir = ""
-
-  fmt.println("[CMD]:", cmd)
-
-  procc.command = cmd
-  p, err := os2.process_start(procc)
+  p, err := exec_and_run_async(cmd)
   if err != nil do return err
   ps, err2 := os2.process_wait(p)
-  if err2 != nil do return err
+  if err2 != nil do return err2
   if ps.exit_code != 0 do return os2.General_Error.None
   err = os2.process_close(p)
   if err != nil do return err
@@ -29,7 +22,6 @@ exec_and_run_sync :: proc(cmd: []string) -> Maybe(os2.Error) {
 }
 
 exec_and_run_async :: proc(cmd: []string) -> (os2.Process,  Maybe(os2.Error)) {
-
   procc: os2.Process_Desc
   procc.stderr = os2.stderr
   procc.stdout = os2.stdout
