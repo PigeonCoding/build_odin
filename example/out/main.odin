@@ -26,6 +26,7 @@ main :: proc() {
     fmt.eprintln(err)
     os2.exit(1)
   }
-
-  odin_builder.exec_and_run_async([]string{"rm", os2.args[0]})
+  if ODIN_OS == .Windows {
+    odin_builder.exec_and_run_async([]string{"rm", os2.args[0]})
+  }
 }
