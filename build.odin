@@ -1,45 +1,45 @@
-// v0.3
+// v0.4
 package build_odin
 
 import "core:fmt"
-import "core:os/os2"
+import "core:os"
 import "core:strconv"
 import "core:strings"
 
 
-exec_and_run_sync :: proc(cmd: []string) -> Maybe(os2.Error) {
-  procc: os2.Process_Desc
-  procc.stderr = os2.stderr
-  procc.stdout = os2.stdout
+exec_and_run_sync :: proc(cmd: []string) -> Maybe(os.Error) {
+  procc: os.Process_Desc
+  procc.stderr = os.stderr
+  procc.stdout = os.stdout
   procc.env = nil
   procc.working_dir = ""
 
   fmt.println("[CMD]:", cmd)
 
   procc.command = cmd
-  p, err := os2.process_start(procc)
+  p, err := os.process_start(procc)
   if err != nil do return err
-  ps, err2 := os2.process_wait(p)
+  ps, err2 := os.process_wait(p)
   if err2 != nil do return err
-  if ps.exit_code != 0 do return os2.General_Error.None
-  err = os2.process_close(p)
+  if ps.exit_code != 0 do return os.General_Error.None
+  err = os.process_terminate(p)
   if err != nil do return err
 
   return nil
 
 }
 
-exec_and_run_async :: proc(cmd: []string) -> (os2.Process, Maybe(os2.Error)) {
-  procc: os2.Process_Desc
-  procc.stderr = os2.stderr
-  procc.stdout = os2.stdout
+exec_and_run_async :: proc(cmd: []string) -> (os.Process, Maybe(os.Error)) {
+  procc: os.Process_Desc
+  procc.stderr = os.stderr
+  procc.stdout = os.stdout
   procc.env = nil
   procc.working_dir = ""
 
   fmt.println("[CMD]:", cmd)
 
   procc.command = cmd
-  p, err := os2.process_start(procc)
+  p, err := os.process_start(procc)
   if err != nil do return p, err
 
   return p, nil
@@ -398,7 +398,7 @@ build_cmd :: proc(b: ^odin_cmd_builder) -> [dynamic]string {
     append(&res, "root")
   case .none:
     fmt.eprintln("you have to choose a main_cmd type to continue")
-    os2.exit(1)
+    os.exit(1)
   }
 
   if b.directory == "" {
@@ -414,7 +414,7 @@ build_cmd :: proc(b: ^odin_cmd_builder) -> [dynamic]string {
   if b.flags.out != "" {
     append(&res, strings.concatenate({"-out:", b.flags.out}))
   } else {
-    append(&res, strings.concatenate({"-out:", os2.args[0]}))
+    append(&res, strings.concatenate({"-out:", os.args[0]}))
   }
 
   switch b.flags.optimization {
@@ -466,7 +466,7 @@ build_cmd :: proc(b: ^odin_cmd_builder) -> [dynamic]string {
 
   if b.flags.thread_count > 0 {
     buf := make([]u8, 100)
-    append(&res, strings.concatenate({"-thread-count:", strconv.itoa(buf, b.flags.thread_count)}))
+    append(&res, strings.concatenate({"-thread-count:", strconv.write_int(buf, auto_cast b.flags.thread_count, 10)}))
   }
 
   if b.flags.keep_temp_files {
@@ -481,7 +481,7 @@ build_cmd :: proc(b: ^odin_cmd_builder) -> [dynamic]string {
     switch v in d.value {
     case int:
       buf := make([]u8, 100)
-      append(&res, strings.concatenate({"-define:", d.key, "=", strconv.itoa(buf, d.value.(int))}))
+      append(&res, strings.concatenate({"-define:", d.key, "=", strconv.write_int(buf, auto_cast d.value.(int), 10)}))
     case bool:
       if d.value.(bool) {
         append(&res, strings.concatenate({"-define:", d.key, "=true"}))
@@ -933,7 +933,7 @@ build_cmd :: proc(b: ^odin_cmd_builder) -> [dynamic]string {
     bu := make([]u8, 100)
     append(
       &res,
-      strings.concatenate({"-max-error-count:", strconv.itoa(bu, b.flags.max_error_count)}),
+      strings.concatenate({"-max-error-count:", strconv.write_int(bu, auto_cast b.flags.max_error_count, 10)}),
     )
   }
 

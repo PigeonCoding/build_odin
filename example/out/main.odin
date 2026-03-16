@@ -22,7 +22,7 @@ main :: proc() {
 
   cmd := odin_builder.build_cmd(&b)
 
-  if err := odin_builder.exec_and_run_sync(cmd[:]); err != nil {
+  if err, ok := odin_builder.exec_and_run_sync(cmd[:]); !ok {
     fmt.eprintln(err)
     os2.exit(1)
   }
