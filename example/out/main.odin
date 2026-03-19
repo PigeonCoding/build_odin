@@ -13,7 +13,7 @@ main :: proc() {
   } else if ODIN_OS == .Windows {
     b.flags.out = "example/out/test.exe"
   } else {
-    fmt.println("what os is this")
+    fmt.eprintln("what os is this")
     os.exit(1)
   }
   b.flags.thread_count = 4
@@ -22,11 +22,8 @@ main :: proc() {
 
   cmd := odin_builder.build_cmd(&b)
 
-  if err, ok := odin_builder.exec_and_run_sync(cmd[:]).?; !ok {
+  if err, not_ok := odin_builder.exec_and_run_sync(cmd[:]).?; not_ok {
     fmt.eprintln(err)
     os.exit(1)
-  }
-  if ODIN_OS == .Windows {
-    odin_builder.exec_and_run_async([]string{"rm", os.args[0]})
   }
 }
